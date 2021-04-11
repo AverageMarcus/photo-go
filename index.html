@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Photos</title>
+    <style>
+      .image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+        display: block;
+        background-size: cover;
+        background-repeat: no-repeat;
+        opacity: 0;
+        -webkit-transition: opacity 3s ease-in-out;
+        -moz-transition: opacity 3s ease-in-out;
+        -o-transition: opacity 3s ease-in-out;
+        transition: opacity 3s ease-in-out;
+      }
+
+      .image.active {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="image active"></div>
+    <div class="image"></div>
+
+    <script type="text/javascript">
+    function process() {
+      const width = document.documentElement.clientWidth;
+      const height = document.documentElement.clientHeight;
+      const timestamp = (new Date()).getTime();
+
+      let nextElement = document.querySelector('.image:not(.active)');
+
+      let im = new Image();
+      im.src = `/image/?width=${width}&height=${height}&ts=${timestamp}`;
+      im.onload = function() {
+        nextElement.style.backgroundImage = `url('${im.src}')`;
+        [...document.querySelectorAll('.image')].forEach(el => el.classList.toggle('active'));
+        setTimeout(process, 5000);
+      };
+    }
+
+    process();
+    </script>
+  </body>
+</html>
