@@ -3,6 +3,13 @@
   <head>
     <title>Photos</title>
     <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+      }
       .image {
         position: absolute;
         top: 0;
@@ -10,25 +17,57 @@
         height: 100vh;
         width: 100vw;
         display: block;
-        background-size: cover;
-        background-repeat: no-repeat;
         opacity: 0;
+        text-align: center;
         -webkit-transition: opacity 3s ease-in-out;
         -moz-transition: opacity 3s ease-in-out;
         -o-transition: opacity 3s ease-in-out;
         transition: opacity 3s ease-in-out;
       }
 
+      .image .bg {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+        z-index: -1;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+        filter: blur(30px);
+        -webkit-filter: blur(30px);
+        -moz-filter: blur(30px);
+        -o-filter: blur(30px);
+        -ms-filter: blur(30px);
+      }
+
       .image.active {
         opacity: 1;
+      }
+
+      .image img {
+        max-height: 100vh;
+        max-width: 100vw;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
       }
     </style>
   </head>
   <body>
-    <div class="image active"></div>
-    <div class="image"></div>
+    <div class="image active">
+      <div class="bg"></div>
+      <img />
+    </div>
+    <div class="image">
+      <div class="bg"></div>
+      <img />
+    </div>
 
     <script type="text/javascript">
+    let crop = window.location.search.includes("crop");
     function process() {
       const width = document.documentElement.clientWidth;
       const height = document.documentElement.clientHeight;
@@ -37,9 +76,14 @@
       let nextElement = document.querySelector('.image:not(.active)');
 
       let im = new Image();
-      im.src = `/image/?width=${width}&height=${height}&ts=${timestamp}`;
+      im.src = `/image/?width=${width}&height=${height}&ts=${timestamp}&crop=${crop ? 'true' : 'false'}`;
+      if (crop) {
+        im.style.width = "100vw";
+        im.style.height = "100vh";
+      }
       im.onload = function() {
-        nextElement.style.backgroundImage = `url('${im.src}')`;
+        nextElement.querySelector('.bg').style.backgroundImage = `url('${im.src}')`;
+        nextElement.replaceChild(im, nextElement.querySelector('img'));
         [...document.querySelectorAll('.image')].forEach(el => el.classList.toggle('active'));
         setTimeout(process, 5000);
       };
